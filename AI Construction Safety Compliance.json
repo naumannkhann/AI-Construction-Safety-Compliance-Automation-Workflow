@@ -1,0 +1,314 @@
+{
+  "name": "AI Construction Safety Compliance",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e4292ff8-904b-412f-876b-dfda0c8fb1cd",
+              "leftValue": "={{ $json[\"objects\"].some(obj => obj.object === \"helmet\") }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1008,
+        -1152
+      ],
+      "id": "9a1c4621-2a27-4e79-b94b-0cdc8933df70",
+      "name": "Violation Check"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1680,
+        -1152
+      ],
+      "id": "a754a5c0-c82c-4451-b151-525d2c183590",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "sendTo": "nomiikhann6@gmail.com",
+        "subject": "SAFETY VIOLATION DETECTED",
+        "message": "=⚠️ Safety Violation Detected\nHelmet Missing!\nImage URL: {{ $('Image Input').item.json.image_url }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -784,
+        -1136
+      ],
+      "id": "597f3841-480f-43b4-925c-840d98a2a1d4",
+      "name": "Send a message to compliance",
+      "webhookId": "caa7c97e-6d0a-49c7-981e-499aedf4386c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6eZS0F7cpZQlz9ya",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qxrI0dM2DULZibLM9cW3o0xBCX5M_lQ6txyP-oILS5M",
+          "mode": "list",
+          "cachedResultName": "Permanent compliance record",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qxrI0dM2DULZibLM9cW3o0xBCX5M_lQ6txyP-oILS5M/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qxrI0dM2DULZibLM9cW3o0xBCX5M_lQ6txyP-oILS5M/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Image Url": "={{ $('Image Input').item.json.image_url }}",
+            "Helmet Missing": "Yes",
+            "Timestamp": "={{ $('Image Input').item.json.Timestamp }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Helmet Missing",
+              "displayName": "Helmet Missing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image Url",
+              "displayName": "Image Url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -608,
+        -1136
+      ],
+      "id": "91aa0538-ef8d-4f6b-b643-f743266cf84a",
+      "name": "Add data for record",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "nLiRKQQKdFosXjmF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://nkaiservice1.cognitiveservices.azure.com/vision/v3.2/detect",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Ocp-Apim-Subscription-Key",
+              "value": ""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "=data",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1168,
+        -1152
+      ],
+      "id": "b86abc5b-7c71-4487-a89f-77a390e29ff4",
+      "name": "Azure HTTP"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1344,
+        -1152
+      ],
+      "id": "b6e7e149-461b-4e14-abd0-5bc50fae7b13",
+      "name": "HTTP Download Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8893e91-b482-42af-adeb-71d44c3687dd",
+              "name": "=image_url",
+              "value": "=https://github.com/naumannkhann/newreps/blob/main/onlyvest.jpg?raw=true",
+              "type": "string"
+            },
+            {
+              "id": "cad5f003-9f4c-4bd8-9849-0006e316ade0",
+              "name": "Timestamp",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1520,
+        -1152
+      ],
+      "id": "51b004f7-d319-4a71-868a-110479a84183",
+      "name": "Image Input"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Violation Check": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a message to compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Image Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message to compliance": {
+      "main": [
+        [
+          {
+            "node": "Add data for record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure HTTP": {
+      "main": [
+        [
+          {
+            "node": "Violation Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Download Request": {
+      "main": [
+        [
+          {
+            "node": "Azure HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Input": {
+      "main": [
+        [
+          {
+            "node": "HTTP Download Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "43b6f1b6-c591-4421-ab7a-df9ee5ba52d9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f9ca05499a65d18ad1bb67bd915d3e37f826b13f50755ca37c97d448d967f525"
+  },
+  "id": "oYBMIo1TlrnaXi4_ioAIC",
+  "tags": []
+}
